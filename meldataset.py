@@ -79,8 +79,17 @@ class FilePathDataset(torch.utils.data.Dataset):
         spect_params = SPECT_PARAMS
         mel_params = MEL_PARAMS
 
+        self.root_path = root_path
+
         _data_list = [l.strip().split('|') for l in data_list]
-        self.data_list = [data if len(data) == 3 else (*data, 0) for data in _data_list]
+        _final_data_list = []
+        for data in _data_list:
+            wave_path = data[0]
+            seconds = librosa.get_duration(filename=osp.join(self.root_path, wave_path))
+            if seconds > 1.5:
+                _final_data_list.append(data)
+
+        self.data_list = [data if len(data) == 3 else (*data, 0) for data in _final_data_list]
         self.text_cleaner = TextCleaner()
         self.sr = sr
 
@@ -97,8 +106,7 @@ class FilePathDataset(torch.utils.data.Dataset):
             tl = f.readlines()
         idx = 1 if '.wav' in tl[0].split('|')[0] else 0
         self.ptexts = [t.split('|')[idx] for t in tl]
-        
-        self.root_path = root_path
+
 
     def __len__(self):
         return len(self.data_list)
