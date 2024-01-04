@@ -85,7 +85,7 @@ class FilePathDataset(torch.utils.data.Dataset):
         _final_data_list = []
         for data in _data_list:
             wave_path = data[0]
-            seconds = librosa.get_duration(filename=osp.join(self.root_path, wave_path))
+            seconds = librosa.get_duration(path=osp.join(self.root_path, wave_path))
             if seconds > 1.5:
                 _final_data_list.append(data)
 
